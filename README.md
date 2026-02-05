@@ -2,8 +2,7 @@
 
 ## List
 
-+ [pyapp](https://ofek.dev/pyapp/): pack python application by rust
-
++ [pyapp-doc](https://ofek.dev/pyapp/)
 
 ## Usage
 
