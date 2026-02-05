@@ -1,0 +1,90 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# user
+*.d
+*.lh
+package-lock.json
+
+# self
+analyze/
+*.d
+*.zip
+__temp/
+.lh/
+.env
+*.psd
+*.clip
+log/
+# self/build
+*.tmp
+*.temp
+temp
+*test.*
+tree.txt
+*-in.txt
+untitled*
+Pipfile
+Pipfile.lock
+codecov*
+*_local.yml
+*-lock.yaml
+*.hash
+*.lock
+# self/conf
+conf.yml
+# ide
+.cursor
+plans/
+.kilocode/*
+.kilocodemodes
+.claude
+.ace-tool/
+nul
+openspec/
+# uv
+.python-version
+*.exe
+# Desktop deployment
+deploy/stage/
+schemas/
+target/
+debug/
+**/*.rs.bk
+*.pdb
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.env.local
+.env.*.local
+*.wixobj
+*.wixpdb
