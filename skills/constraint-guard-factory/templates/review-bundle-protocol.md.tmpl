@@ -1,0 +1,97 @@
+<!-- FACTORY:BEGIN GENERATED file="{{references.review_protocol.output}}" template="review-bundle-protocol.md" manifest_version="{{manifest_version}}" factory_version="{{factory_version}}" -->
+# `{{artifacts.review_bundle.root_dir}}` 约束审查请求协议
+
+## 目的
+
+这个协议用于约束业务 agent 在 {{skill.subject_name}} 开发后，如何通过 `{{artifacts.review_bundle.root_dir}}` 提交"约束审查请求"。
+
+目标是让后续审查能直接判断：
+
+- 本次改动触碰了哪些 `{{contracts.axis_prefix}}-*`
+- 哪些 contract 被保持
+- 哪些地方发生漂移
+- 证据是否足够支撑最末轴（Evidence Contract）
+
+## 适用场景
+
+以下情况都必须使用本协议：
+
+1. 业务实现触碰 {{skill.subject_name}} 的核心链路
+2. 报告要说明计划中哪些 key point 被实现、补强或修复
+3. 报告要告诉 skill"这次应该复核哪些 `{{contracts.axis_prefix}}-*`"
+4. 其他 agent 需要把 `{{artifacts.review_bundle.root_dir}}` 作为结构化交接目录
+
+## Bundle 目录规则
+
+1. `{{artifacts.review_bundle.root_dir}}` 根目录只允许出现 session bundle 目录。
+2. 有效 bundle 目录命名为：`{{artifacts.review_bundle.prefix}}_<change>_<YYYYMMDD_HHMMSS>`
+3. 每个 bundle 根目录只允许出现以下条目：
+   - `{{artifacts.review_bundle.request_filename}}`
+   - `{{artifacts.review_bundle.evidence_dir}}/`
+   - `{{artifacts.review_bundle.diagnostics_dir}}/`
+4. `{{artifacts.review_bundle.evidence_dir}}/` 只放可追溯材料：最小测试输出、真实运行日志、真实窗口截图、真实网络验证输出。新增测试脚本、probe 脚本或 bundle 说明文本本身默认不算 evidence。
+5. `{{artifacts.review_bundle.diagnostics_dir}}/` 只放诊断材料：offscreen 结果、probe 结果、shim / fallback 记录、临时脚本输出、不能直接支撑 contract 结论的排障产物。
+6. bundle 根目录不允许额外散落文件。
+
+`{{artifacts.review_bundle.root_dir}}` bundle 是约束审查输入，不是任务已完成的证明。
+
+## `{{artifacts.review_bundle.request_filename}}` 必填章节
+
+缺任何一项，都视为最末轴 `MISSING`：
+
+1. `# {{skill.subject_name}} Constraint Review Request`
+2. `## Metadata`
+3. `## Task Type`
+4. `## Scope`
+5. `## Target Business Change`
+6. `## OpenSpec Traceability`
+{{#each contracts.axes}}
+7. `## {{title}} Surface`
+{{/each}}
+8. `## Validation Route`
+9. `## Verification Closure`
+10. `## Evidence Index`
+11. `## Diagnostic Only Material`
+12. `## Drift Risks`
+13. `## Requested Skill Updates`
+14. `## Proposed {{contracts.axis_prefix}} Review`
+
+## 自动拒绝条件
+
+出现以下任一情况时，该 bundle 不能作为有效约束审查输入：
+
+1. `{{artifacts.review_bundle.root_dir}}` 根目录散落文件被直接当作正式输入
+2. `{{artifacts.review_bundle.request_filename}}` 缺少必填章节
+3. 报告没有说明本次触碰哪些 `{{contracts.axis_prefix}}-*`
+4. 报告把诊断材料写进 `Evidence Index`
+5. 报告要求通过修改约束集来让当前补丁显得没有漂移
+6. 报告正文大段粘贴原始日志，而不是放入 `{{artifacts.review_bundle.evidence_dir}}/` 或 `{{artifacts.review_bundle.diagnostics_dir}}/`
+7. 报告把新增测试、probe 或临时脚本本身直接当作"问题已解决"的证据
+8. `fix` 任务没有写清目标业务入口、目标行为变化或真实业务代码改动
+9. `fix` 任务只提交测试 / 诊断 / bundle 产物，没有说明被修复的实现入口
+10. `## Validation Route` 没有说明验证产物对应哪个业务改动，或没有说明实际使用了哪条输出作为证据
+11. 报告把“bundle 已补”“诊断已做”或“还需要用户手动验证”写成接近完成或默认收尾结论
+12. 报告要求用户执行主要验证，但没有明确说明为什么当前状态只能是 `MISSING` 或 `BLOCKED`
+13. 涉及视觉验收脚本、probe 或窗口入口时，报告只提供特殊环境变量下的 agent 自测命令，没有提供用户默认直接打开入口
+
+## 提交前自检
+
+1. bundle 根目录是否只包含 `{{artifacts.review_bundle.request_filename}}`、`{{artifacts.review_bundle.evidence_dir}}/`、`{{artifacts.review_bundle.diagnostics_dir}}/`
+2. `{{artifacts.review_bundle.request_filename}}` 是否明确写出任务类型，以及触碰的 `{{contracts.axis_prefix}}-*`
+3. 若任务是 `fix`，是否明确写出目标业务入口、目标行为变化和真实业务代码改动
+4. 每个引用文件是否只出现在 `Evidence Index` 或 `Diagnostic Only Material` 之一
+5. `## Validation Route` 是否说明了验证产物验证的是哪段业务改动，而不是仅说明文件被创建
+6. 是否明确指出本次最容易漂移的 contract
+7. 若仍需要人工验证，是否已明确它只是残余风险或外部 blocker，而不是默认主验收路径
+8. 若涉及视觉验收脚本或 probe，是否同时写出了 agent 自测命令和用户默认直接打开入口
+
+## 给业务 agent 的固定入口
+
+若任务需要业务 agent 同时产出材料，直接附上：
+
+1. `{{references.request_template.output}}`
+2. `{{references.guard_update_hook.output}}`
+<!-- FACTORY:END GENERATED -->
+
+<!-- FACTORY:BEGIN CUSTOM file="{{references.review_protocol.output}}" slot="appendix" -->
+<!-- FACTORY:END CUSTOM -->

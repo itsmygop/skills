@@ -1,0 +1,55 @@
+<!-- FACTORY:BEGIN GENERATED file="{{references.acceptance_change_policy.output}}" template="acceptance-change-policy.md" manifest_version="{{manifest_version}}" factory_version="{{factory_version}}" -->
+# {{skill.subject_name}} 约束集变更策略
+
+## 仓库规则
+
+约束集服务于业务实现，不能反过来为当前补丁改写 contract。
+
+## 这条规则的含义
+
+1. 约束集包括{{#each contracts.axes}}{{title}}{{#unless @last}}、{{/unless}}{{/each}}。
+2. 业务代码修复后，可以新增：
+   - 新的代码锚点说明
+   - 新的最小测试要求
+   - 新的证据模板
+   - 新的漂移案例说明
+3. 业务代码修复后，不可以为了让当前结果显得正确去：
+   - 删除既有 contract
+   - 放宽约束
+   - 改写 contract 含义
+   - 用当前实现倒推 skill 结论
+
+## 验收材料不能替代修复
+
+1. 新增测试脚本、probe 脚本、bundle 报告或诊断产物，只能证明"任务有了验证手段"或"问题可以复现 / 排查"。
+2. 除非任务目标明确是补测试、补诊断或做审查，这些产物不能单独构成"问题已解决"。
+3. `fix` 任务必须把验证产物指向真实业务代码改动与行为变化，而不是把脚本或报告本身写成修复结果。
+4. 若当前补丁只补了测试或诊断产物，应把结果表述为"新增验证能力"或"补了复现材料"，不能表述为"功能已修复"。
+
+## 何时允许更新 skill
+
+只有以下情况允许更新 skill：
+
+1. 计划文档或 OpenSpec 明确新增了 contract
+2. 当前 skill 漏掉了已经在代码中稳定落地的关键约束
+3. 现有描述不足以阻止常见漂移，需要追加说明
+
+## 何时不允许更新 skill
+
+以下情况不应更新 skill，而应修正实现或补证据：
+
+1. 当前补丁只是暂时缺少测试
+2. 当前实现和现有 contract 冲突
+3. 想通过改 wording 掩盖语义已漂移
+4. 当前补丁只新增测试、probe、bundle 或诊断材料，却想把任务状态写成已解决
+
+## 产物规则
+
+1. `{{artifacts.visual_results_dir}}` 放正式验收结果。
+2. `{{artifacts.review_bundle.root_dir}}` 放按协议组织的约束审查请求 bundle。
+3. `{{artifacts.review_bundle.root_dir}}` 根目录散落的临时文件默认都只是诊断材料。
+4. 验证脚本本身默认不属于正式验收结果；只有它指向的真实输出和真实行为变化，才可能进入正式 evidence。
+<!-- FACTORY:END GENERATED -->
+
+<!-- FACTORY:BEGIN CUSTOM file="{{references.acceptance_change_policy.output}}" slot="appendix" -->
+<!-- FACTORY:END CUSTOM -->

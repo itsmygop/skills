@@ -1,10 +1,12 @@
-# Awesome ai
+# ai related
 
 ## Skills
 
-+ [pyapp-doc](https://ofek.dev/pyapp/)
-+ [tauri-v2-crossplatform-doc](https://v2.tauri.org.cn/)
-+ docs-style
++ [constraint-guard-factory](/skills/README.md)  
+Create Development constraints sub-skill
+
++ [next](/skills/README.md)  
+Summarize the current conversation before the quota and inherit it from the next session through the document to reduce AI hallucinations
 
 ## Exp
 

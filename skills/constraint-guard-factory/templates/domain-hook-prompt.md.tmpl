@@ -1,0 +1,27 @@
+<!-- FACTORY:BEGIN GENERATED file="{{hook.output}}" template="domain-hook-prompt.md" manifest_version="{{manifest_version}}" factory_version="{{factory_version}}" -->
+# {{hook.title}}
+
+当另一个 agent 要处理{{hook.trigger}}时，直接附上下面这段提示。
+
+```text
+Use ${{skill.id}} to constrain this task.
+
+Read first:
+- `{{references.contract_map.output}}`
+{{#each hook.read_paths}}
+- `{{this}}`
+{{/each}}
+
+{{#each hook.body_sections}}
+{{this}}
+
+{{/each}}
+```
+
+## 使用意图
+
+这段 hook prompt 的作用是让业务 agent 在处理{{hook.trigger}}时，受到约束集的前置约束。
+<!-- FACTORY:END GENERATED -->
+
+<!-- FACTORY:BEGIN CUSTOM file="{{hook.output}}" slot="appendix" -->
+<!-- FACTORY:END CUSTOM -->

@@ -1,0 +1,67 @@
+<!-- FACTORY:BEGIN GENERATED file="{{references.contract_map.output}}" template="contract-map.md" manifest_version="{{manifest_version}}" factory_version="{{factory_version}}" -->
+# {{skill.subject_name}} 约束图
+
+## 目的
+
+这个文件把{{#if source_documents.plan}} `{{source_documents.plan}}`{{else}}计划文档{{/if}} 中最容易被业务 agent 漂移的关键点，映射到当前代码中的锚点。
+
+默认先读这个文件，再决定本次任务会触碰哪些 `{{contracts.axis_prefix}}-*`。
+
+{{#each contracts.axes}}
+## {{contracts.axis_prefix}}-{{@index_1_padded}} {{title}}
+
+### 固定约束
+
+{{#each constraints}}
+- {{this}}
+{{/each}}
+
+### 代码锚点
+
+{{#each anchors}}
+- `{{path}}{{#if symbol}}::{{symbol}}{{/if}}`
+{{/each}}
+
+### 常见漂移
+
+{{#each common_drifts}}
+- {{this}}
+{{/each}}
+
+{{/each}}
+{{#if optional_modules.constraint_overlays}}
+{{#each optional_modules.constraint_overlays}}
+## {{#each applies_to_axes}}`{{this}}`{{#unless @last}} / {{/unless}}{{/each}} 补充：{{title}}
+
+### 固定约束
+
+{{#each constraints}}
+- {{this}}
+{{/each}}
+
+### 代码锚点
+
+{{#each anchors}}
+- `{{path}}{{#if symbol}}::{{symbol}}{{/if}}`
+{{/each}}
+
+### 常见漂移
+
+{{#each common_drifts}}
+- {{this}}
+{{/each}}
+
+{{/each}}
+{{/if}}
+## 使用方式
+
+当你起一个业务 agent 时，至少先让它回答四件事：
+
+1. 本次触碰了哪些 `{{contracts.axis_prefix}}-*`
+2. 每个 `{{contracts.axis_prefix}}-*` 的固定约束是什么
+3. 哪些现有代码锚点不能被改坏
+4. 本次需要补哪些最小证据
+<!-- FACTORY:END GENERATED -->
+
+<!-- FACTORY:BEGIN CUSTOM file="{{references.contract_map.output}}" slot="appendix" -->
+<!-- FACTORY:END CUSTOM -->

@@ -1,0 +1,119 @@
+<!-- FACTORY:BEGIN GENERATED file="{{references.request_template.output}}" template="request-template.md" manifest_version="{{manifest_version}}" factory_version="{{factory_version}}" -->
+# {{skill.subject_name}} 约束审查请求模板
+
+将下面内容复制到 `{{artifacts.review_bundle.root_dir}}/<bundle>/{{artifacts.review_bundle.request_filename}}`，再替换占位符。
+
+```markdown
+# {{skill.subject_name}} Constraint Review Request
+
+## Metadata
+- Change: `<change>`
+- Task refs: `<tasks>`
+- Author: `<agent>`
+- Date: `<YYYY-MM-DD HH:MM:SS +TZ>`
+- Worktree / branch: `<worktree-or-branch>`
+
+## Task Type
+- Type:
+  `fix` / `test-only` / `diagnostic-only` / `review-only`
+- Why this type fits:
+  `<why this request is a fix, test-only, diagnostic-only, or review-only task>`
+- Completion claim:
+  `<what this request says is done, and what is not done>`
+
+## Scope
+- Business files:
+  `<file>`
+- Touching {{contracts.axis_prefix}}:
+  {{#each contracts.axes}}`{{contracts.axis_prefix}}-{{@index_1_padded}}`{{#unless @last}}, {{/unless}}{{/each}}
+- Out of scope:
+  `<what-this-request-does-not-change>`
+
+## Target Business Change
+- Target entry / symbol:
+  `<file::symbol>` / `None`
+- Expected behavior change:
+  `<what should be different after this request>`
+- Production / business code touched:
+  `<file>` / `None, because this request is test-only / diagnostic-only / review-only`
+
+## OpenSpec Traceability
+- Plan:
+  `{{source_documents.plan}}`
+- Proposal:
+  `{{source_documents.proposal}}`
+- Code anchors:
+  `<file::symbol>`
+
+{{#each contracts.axes}}
+## {{title}} Surface
+- `<relevant details for {{contracts.axis_prefix}}-{{@index_1_padded}}>`
+
+{{/each}}
+## Validation Route
+- Validation artifact:
+  `{{artifacts.review_bundle.evidence_dir}}/<file>` / `{{artifacts.review_bundle.diagnostics_dir}}/<file>`
+- Validates business change:
+  `<which target entry or behavior this artifact validates>`
+- Why artifact existence alone is insufficient:
+  `<what actual output or observation is used as evidence>`
+- Agent self-check command:
+  `<command-with-special-env-if-needed>` / `None`
+- User manual review entrypoint:
+  `<default-direct-open-command-or-file>` / `None`
+
+## Verification Closure
+- Conversation artifact reviewed:
+  `{{planning.conversation_artifact}}`
+- Automated / runnable checks executed:
+  `<command-or-scenario>` / `None`
+- Remaining manual-only verification:
+  `<what-still-needs-human-confirmation>` / `None`
+- Why remaining coverage cannot be closed in this turn:
+  `<reason>` / `None`
+- Current validation closure:
+  `KEEP` / `MISSING` / `BLOCKED`
+- Why this request can or cannot claim the task is complete:
+  `<short conclusion>`
+
+## Evidence Index
+- E-01 | `<type>` | `{{artifacts.review_bundle.evidence_dir}}/<file>` | Supports {{contracts.axis_prefix}}-01 | Capable: contract
+- None
+
+## Diagnostic Only Material
+- D-01 | `{{artifacts.review_bundle.diagnostics_dir}}/<file>` | `<why diagnostic only>`
+- None
+
+## Drift Risks
+- `<highest-risk {{contracts.axis_prefix}}-*>`
+- `<remaining missing coverage or blockers>`
+
+## Requested Skill Updates
+- Target file:
+  `<skill-file>` / `None`
+  Change type:
+  `add` / `append` / `clarify`
+  Reason:
+  `<why the skill itself needs change>`
+
+## Proposed {{contracts.axis_prefix}} Review
+{{#each contracts.axes}}
+- {{contracts.axis_prefix}}-{{@index_1_padded}}: KEEP / DRIFT / BLOCKED / MISSING
+{{/each}}
+```
+
+## 使用约束
+
+1. `Evidence Index` 与 `Diagnostic Only Material` 二选一登记每个文件，不允许重复。
+2. `Evidence Index` 主要服务最末轴，不要把诊断文件塞进去。
+3. `fix` 任务必须写清 `Target Business Change`；若没有真实业务代码改动，不得在正文中声称问题已解决。
+4. 新增测试、脚本、probe 或 bundle 只能写进 `Validation Route`、`Evidence Index` 或 `Diagnostic Only Material`，不能把它们本身描述成修复结果。
+5. `Requested Skill Updates` 可以写 `None`，但不能借此要求放宽既有 contract。
+6. `Proposed {{contracts.axis_prefix}} Review` 不是形式项，必须和正文一致。
+7. `Current validation closure` 只能写 `KEEP`、`MISSING`、`BLOCKED`；若主要验收仍依赖人工验证，不得写成 `KEEP`。
+8. 不得用“已实现 / 已修复，剩下请用户确认”替代 `Verification Closure` 里的状态说明。
+9. 若 `Validation Route` 涉及视觉验收脚本、probe 或窗口入口，必须同时给出 agent 自测命令与用户默认直接打开入口；不得要求用户复用特殊环境变量。
+<!-- FACTORY:END GENERATED -->
+
+<!-- FACTORY:BEGIN CUSTOM file="{{references.request_template.output}}" slot="appendix" -->
+<!-- FACTORY:END CUSTOM -->

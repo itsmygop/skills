@@ -1,0 +1,60 @@
+<!-- FACTORY:BEGIN GENERATED file="{{references.guard_update_hook.output}}" template="guard-update-hook-prompt.md" manifest_version="{{manifest_version}}" factory_version="{{factory_version}}" -->
+# {{skill.subject_name}} 约束审查 Hook Prompt
+
+当业务型 agent 完成 {{skill.subject_name}} 相关改动，且需要留下可复核的 `{{artifacts.review_bundle.root_dir}}` bundle 时，直接附上下面这段提示。
+
+```text
+After finishing the code change, also prepare a constraint-review bundle for `{{skill.id}}`.
+
+Read first:
+- `{{references.contract_map.output}}`
+- `{{references.review_protocol.output}}`
+- `{{references.request_template.output}}`
+{{#if optional_modules.visual_acceptance.enabled}}
+- If the change touches visual/theme behavior, also read:
+  - `{{optional_modules.visual_acceptance.output}}`
+{{/if}}
+
+Required output:
+1. Create `{{artifacts.review_bundle.root_dir}}/{{artifacts.review_bundle.prefix}}_<change>_<YYYYMMDD_HHMMSS>/`.
+2. Inside the bundle create exactly:
+   - `{{artifacts.review_bundle.request_filename}}`
+   - `{{artifacts.review_bundle.evidence_dir}}/`
+   - `{{artifacts.review_bundle.diagnostics_dir}}/`
+3. In `{{artifacts.review_bundle.request_filename}}`, explicitly list which of {{contracts.axis_prefix}}-01..{{contracts.axis_prefix}}-{{contracts.axes.length_padded}} are touched.
+4. Put only review-capable artifacts in `{{artifacts.review_bundle.evidence_dir}}/`.
+5. Put diagnostic-only artifacts in `{{artifacts.review_bundle.diagnostics_dir}}/`.
+6. In the request, fill `## Task Type`, `## Target Business Change`, and `## Validation Route`.
+7. Fill `## Verification Closure` and treat it as a required conclusion, not optional narrative.
+8. Fill `## Proposed {{contracts.axis_prefix}} Review` with all axes.
+
+Hard rules:
+- Do not leave loose files in `{{artifacts.review_bundle.root_dir}}` root.
+- Do not use diagnostics as contract evidence.
+- Do not request relaxing an existing contract to fit the current patch.
+- Do not skip the code anchors for the touched contracts.
+- Do not treat creating a test, probe, or bundle artifact as task completion unless the task is explicitly `test-only`, `diagnostic-only`, or `review-only`.
+- If the task is a `fix`, point to the changed business code path and the behavior change it produced.
+- If no target business code changed for a `fix` task, do not claim the issue is resolved.
+- Do not end with “implemented/fixed, please verify manually” when the main acceptance still depends on human confirmation.
+- If the main acceptance still depends on user manual verification, say so explicitly and keep the conclusion at `MISSING` or `BLOCKED`.
+- If you provide a visual-acceptance script or probe, include both: an agent self-check command that may use a special environment variable, and a user manual review entrypoint that opens directly under the default environment.
+
+Self-check before finishing:
+- The request states the task type and, for `fix` tasks, the target business change.
+- Every referenced file appears in exactly one of `Evidence Index` or `Diagnostic Only Material`.
+- The report says which contracts were touched, not only which files changed.
+- Any semantic change has at least one minimal evidence item.
+- Any test or probe artifact is described as a validation route, not as the fix itself.
+- The report does not use bundle completeness or pending user validation as a completion claim.
+- If human confirmation is still needed, the report explains why automation stops here and what remains only as residual risk or blocker.
+- Any visual-acceptance script or probe has a default direct-open path for user review, not only an env-var-driven agent path.
+```
+
+## 使用意图
+
+这段 hook prompt 的作用是让业务 agent 在开发收尾时，按 `{{contracts.axis_prefix}}-*` 留下结构化交付。
+<!-- FACTORY:END GENERATED -->
+
+<!-- FACTORY:BEGIN CUSTOM file="{{references.guard_update_hook.output}}" slot="appendix" -->
+<!-- FACTORY:END CUSTOM -->

@@ -1,0 +1,40 @@
+<!-- FACTORY:BEGIN GENERATED file="{{optional_modules.visual_acceptance.output}}" template="visual-acceptance-standard.md" manifest_version="{{manifest_version}}" factory_version="{{factory_version}}" -->
+# {{skill.subject_name}} 真实窗口验收附录
+
+## 说明
+
+这个文件已降级为附录。只有当任务明确要求以下目标时才读取它：
+
+1. 真实窗口视觉验收
+2. 视觉争议复核
+3. 为最末轴补真实窗口证据
+
+默认开发与复核不应先从这里开始，而应先读约束图。
+
+## 执行约束
+
+1. 视觉验收必须基于真实窗口执行。
+2. offscreen、headless、shim、fake runtime、私有方法造景不能作为 `PASS` 依据。
+3. 当真实数据不足时，应记 `BLOCKED`。
+4. 视觉验收只回答界面是否成立，不替代 contract 审查。
+5. 真实窗口验收是补强证据，不是 agent 默认停下的出口。
+6. 若当前主结论仍存在可执行的运行、交互或反馈验证缺口，应先补最小自动验证、smoke 路径或清晰的运行链路证明，再进入真实窗口验收。
+7. 若用户报告的是确定性报错或确定性异常，应先把“无异常运行 + 最小自动验证”补齐，再讨论人工视觉确认。
+8. 若提供视觉验收脚本、probe 或窗口入口，必须额外提供一个用户默认直接打开的复查入口；agent 自测可以使用特殊环境变量，但不能要求用户复用该环境变量。
+9. 视觉验收记录应同时写清 agent 自测命令与用户人工复查入口。
+
+## 验收状态
+
+{{#each optional_modules.visual_acceptance.statuses}}
+- `{{this}}`
+{{/each}}
+
+## 检查项
+
+{{#each optional_modules.visual_acceptance.checks}}
+- {{this}}
+{{/each}}
+<!-- FACTORY:END GENERATED -->
+
+<!-- FACTORY:BEGIN CUSTOM file="{{optional_modules.visual_acceptance.output}}" slot="appendix" -->
+<!-- FACTORY:END CUSTOM -->

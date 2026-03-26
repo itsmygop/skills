@@ -1,0 +1,6 @@
+<!-- FACTORY:BEGIN GENERATED file="{{optional_modules.agent_openai.output}}" template="agents-openai.yaml" manifest_version="{{manifest_version}}" factory_version="{{factory_version}}" -->
+interface:
+  display_name: "{{optional_modules.agent_openai.interface_display_name}}"
+  short_description: "{{optional_modules.agent_openai.short_description}}"
+  default_prompt: "使用 ${{skill.id}} 审查或约束{{skill.scope_label}}。先读取 `{{references.contract_map.output}}`，按 {{contracts.axis_prefix}}-01..{{contracts.axis_prefix}}-{{contracts.axes.length_padded}} 输出 `KEEP` / `DRIFT` / `BLOCKED` / `MISSING`。"
+<!-- FACTORY:END GENERATED -->

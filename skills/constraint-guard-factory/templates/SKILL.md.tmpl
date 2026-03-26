@@ -1,0 +1,172 @@
+<!-- FACTORY:BEGIN GENERATED file="SKILL.md" template="SKILL.md" manifest_version="{{manifest_version}}" factory_version="{{factory_version}}" -->
+---
+name: {{skill.id}}
+description: {{skill.description}}
+---
+
+# {{skill.display_title}}
+
+## 概述
+
+这个 skill 用来约束{{skill.scope_label}}中的"不能漂移的 contract"。
+
+主职责是：
+
+1. 在业务 agent 动手前，把模糊需求收束成 {{skill.subject_name}} 的改动面。
+2. 在开发中或开发后，审查实现是否偏离{{#if source_documents.plan}} `{{source_documents.plan}}`{{/if}} 与当前代码已经落地的约束。
+3. 在需要向其他 agent 或后续轮次移交时，要求产出结构化的 `{{artifacts.review_bundle.root_dir}}` review bundle。
+{{#if optional_modules.visual_acceptance.enabled}}
+4. 只有当任务明确要求真实窗口视觉验收时，才退回读取视觉验收附录。
+{{/if}}
+
+## 先读哪些文件
+
+{{#each reads.groups}}
+{{trigger}}：
+
+{{#each entries}}
+- {{#if (eq mode "run")}}可运行：{{/if}}`{{path}}`
+{{/each}}
+
+{{/each}}
+
+## 审查轴
+
+默认按以下{{contracts.axes.length}}项输出：
+
+{{#each contracts.axes}}
+- `{{contracts.axis_prefix}}-{{@index_1_padded}} {{title}}`
+{{/each}}
+
+每项只允许输出：
+
+- `KEEP`
+- `DRIFT`
+- `BLOCKED`
+- `MISSING`
+
+含义：
+
+- `KEEP`：当前实现或报告保持了既有约束
+- `DRIFT`：实现或报告偏离了既有约束
+- `BLOCKED`：受外部条件阻塞，无法完成该项验证
+- `MISSING`：上下文、证据或最小测试不足，无法确认是否漂移
+
+## Plan / Talk Closure Contract
+
+默认以 `{{planning.conversation_artifact}}` 作为 leader/talk 阶段的收口回放锚点。
+
+在输出 `Proposed Plan` 或任何接近完成的结论前，必须先确认：
+
+{{#each planning.required_closure_checks}}
+- {{this}}
+{{/each}}
+
+固定硬规则：
+
+{{#each planning.hard_rules}}
+- {{this}}
+{{/each}}
+
+## {{contracts.axes.length}}项约束的含义
+
+{{#each contracts.axes}}
+### `{{contracts.axis_prefix}}-{{@index_1_padded}} {{title}}`
+
+{{summary}}：
+
+{{#each constraints}}
+- {{this}}
+{{/each}}
+
+{{/each}}
+
+{{#if optional_modules.constraint_overlays}}
+{{#each optional_modules.constraint_overlays}}
+## 跨 {{#each applies_to_axes}}`{{this}}`{{#unless @last}} / {{/unless}}{{/each}} 的{{title}}
+
+{{#each constraints}}
+- {{this}}
+{{/each}}
+
+{{/each}}
+{{/if}}
+
+## 工作流
+
+1. 先区分用户要做的是业务实现、约束审查、视觉验收、还是 `{{artifacts.review_bundle.root_dir}}` 交付。
+2. 默认先按 `{{references.contract_map.output}}` 将需求映射到 {{contracts.axis_prefix}}-01..{{contracts.axis_prefix}}-{{contracts.axes.length_padded}}。
+3. 若任务是业务开发：
+   - 先区分本次是 `fix`、`test-only`、`diagnostic-only` 还是 `review-only`
+   - 先指出本次改动触碰哪些 `{{contracts.axis_prefix}}-*`
+   - 若是 `fix`，先指出目标业务入口、预期行为变化、以及将触达哪些真实实现
+   - 再指出哪些 contract 不允许改写
+   - 再说明哪些测试、脚本或 probe 只是验证手段，而不是完成结果
+   - 然后才允许生成代码建议或代码修改
+4. 若任务是代码复核：
+   - 先给 {{contracts.axis_prefix}}-01..{{contracts.axis_prefix}}-{{contracts.axes.length_padded}}
+   - 再说明具体漂移点、代码锚点和缺失证据
+5. 若任务在 leader/talk 阶段准备收口：
+   - 先回看 `{{planning.conversation_artifact}}` 或当前对话中的完成口径
+   - 先逐条核对上述 closure checks
+   - 若主结论仍依赖 bundle、测试、日志或用户手动验证，默认停在 `MISSING` 或 `BLOCKED`
+   - 不得把“已补材料”“已补 bundle”“还需你本机确认”组织成完成态结论
+   - 然后才允许输出 `Proposed Plan`
+6. 若任务涉及 `{{artifacts.review_bundle.root_dir}}`：
+   - 先按 `{{references.review_protocol.output}}` 检查 bundle
+   - 改为审查最末轴（Evidence Contract）是否成立
+   - 若请求声称是 `fix`，同时核对 bundle 是否说明了真实业务代码改动与行为变化
+{{#each optional_modules.domain_hooks}}
+7. 若任务涉及{{trigger}}：
+   - 读取 `{{output}}`
+{{/each}}
+{{#if optional_modules.visual_acceptance.enabled}}
+8. 若任务明确要求真实窗口视觉验收：
+   - 读取 `{{optional_modules.visual_acceptance.output}}`
+   - 视觉结论仍可用 {{#each optional_modules.visual_acceptance.statuses}}`{{this}}`{{#unless @last}}、{{/unless}}{{/each}}
+   - 但 skill 主输出仍应先给 `{{contracts.axis_prefix}}-*`
+{{/if}}
+
+## 必须指出为漂移的情况
+
+出现以下任一情况时，应明确指出"这是 contract drift，不是实现自由"：
+
+{{#each contracts.axes}}
+{{#each common_drifts}}
+- {{this}}
+{{/each}}
+{{/each}}
+{{#if optional_modules.constraint_overlays}}
+{{#each optional_modules.constraint_overlays}}
+{{#each common_drifts}}
+- {{this}}
+{{/each}}
+{{/each}}
+{{/if}}
+
+## 输出规则
+
+- 优先输出 {{contracts.axis_prefix}}-01 到 {{contracts.axis_prefix}}-{{contracts.axes.length_padded}}
+- 每项只输出 `KEEP`、`DRIFT`、`BLOCKED`、`MISSING`
+- 若任务是 `fix`，必须同时说明：
+  - 修了哪段业务代码
+  - 改变了什么行为
+  - 用什么最小证据验证该变化
+- 若任务只新增测试、脚本、probe、bundle 或文档，而未触达目标业务实现，不得据此宣称 `KEEP`
+- 若任务本质上只是补测试或补诊断，必须显式写成 `test-only` 或 `diagnostic-only`
+- 若主要结论仍依赖用户手动验证，不得用“已实现”“已修复”或“只差你确认”收尾；默认改判 `MISSING`，受外部限制时才是 `BLOCKED`
+- 若 `{{artifacts.review_bundle.root_dir}}` 或其他审查材料已经齐全，也只能说明“审查输入完整”，不能单独说明任务已完成
+- 若存在 `DRIFT`，必须给出：
+  - 漂移点
+  - 正确 contract
+  - 代码锚点或计划锚点
+- 若存在 `MISSING`，必须明确缺什么最小证据
+{{#if optional_modules.visual_acceptance.enabled}}
+- 若任务还要求真实窗口验收，可在 `{{contracts.axis_prefix}}-*` 之后追加 `VA-*`
+{{/if}}
+- 若任务涉及仓库规则提醒，直接使用这句话：
+  - 约束集服务于业务实现，不能反过来为当前补丁改写 contract。
+<!-- FACTORY:END GENERATED -->
+
+<!-- FACTORY:BEGIN CUSTOM file="SKILL.md" slot="appendix" -->
+<!-- FACTORY:END CUSTOM -->
